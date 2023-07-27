@@ -28,7 +28,7 @@ custom_font = ("Helvetica", 15, "bold")
 window.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 window.configure(bg="#FFFFFF")
 window.title('Encryption Tool')
-icon = PhotoImage(file="assets/favicon-32x32.png")
+icon = PhotoImage(file="assets/favicon-32x32-black.png")
 window.iconphoto(True, icon)
 
 my_app_id = 'my_company.my_product.sub_product.version'  # arbitrary string
@@ -153,6 +153,10 @@ def generate_keys():
         error_message = e.stderr.decode().strip()
         if "Errno 2" in error_message:
             messagebox.showerror("File Not Found!", "The Program for the generating the Key Files was NOT FOUND!")
+            return
+        if "Directory_Not_Selected" in error_message:
+            messagebox.showwarning("No Directory Selected!",
+                                   "You have not chosen any directory for saving the Key Files!")
             return
         elif "FileExistsError" in error_message:
             confirm = messagebox.askyesno("Files Already Exist!",

@@ -93,10 +93,12 @@ def make_key_files(user_name, key_size):
 
     directory_window = Tk()
     directory_window.withdraw()
+    icon = PhotoImage(file="assets/favicon-32x32-blue.png")
+    directory_window.iconphoto(True, icon)
 
     selected_directory = filedialog.askdirectory()
     if not selected_directory:
-        raise
+        raise b"Directory_Not_Selected"
 
     pub_file_path = f"{selected_directory}/{user_name}.pub"
     pub_file = open(pub_file_path, 'w+')
