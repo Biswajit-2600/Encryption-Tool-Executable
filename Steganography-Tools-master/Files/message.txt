@@ -1,0 +1,1 @@
+This is the secret message that i want to encode and send to the desired person without any other person being able to see it.
