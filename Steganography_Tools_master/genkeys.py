@@ -88,27 +88,33 @@ def generate_key(key_size):
     return public_key, private_key
 
 
-def make_key_files(user_name, key_size):
+def write_to_files(public_path, private_path, key_size=1024):
     public_key, private_key = generate_key(key_size)
-
-    directory_window = Tk()
-    directory_window.withdraw()
-    icon = PhotoImage(file="assets/favicon-32x32-blue.png")
-    directory_window.iconphoto(True, icon)
-
-    selected_directory = filedialog.askdirectory()
-    if not selected_directory:
-        raise b"Directory_Not_Selected"
-
-    pub_file_path = f"{selected_directory}/{user_name}.pub"
-    pub_file = open(pub_file_path, 'w+')
+    pub_file = open(public_path, 'w+')
     pub_file.write('%s,%s' % (public_key[0], public_key[1]))
     pub_file.close()
 
-    prv_file_path = f"{selected_directory}/{user_name}.prv"
-    prv_key = open(prv_file_path, 'w+')
+    prv_key = open(private_path, 'w+')
     prv_key.write('%s,%s' % (private_key[0], private_key[1]))
     prv_key.close()
+
+
+def make_key_files(user_name, key_size=1024):
+    directory_window = Tk()
+    directory_window.withdraw()
+
+    selected_directory = filedialog.askdirectory()
+    if not selected_directory:
+        return "directory_not_selected"
+
+    pub_file_path = f"{selected_directory}/{user_name}.pub"
+    prv_file_path = f"{selected_directory}/{user_name}.prv"
+
+    if os.path.exists(pub_file_path) and os.path.exists(prv_file_path):
+        return "FileExistsError#path#%s#path#%s" % (pub_file_path, prv_file_path)
+    else:
+        write_to_files(pub_file_path, prv_file_path, key_size)
+        return ""
 
 
 if __name__ == '__main__':
@@ -116,13 +122,10 @@ if __name__ == '__main__':
     name = ""
     if len(sys.argv) > 1:
         name = sys.argv[1]
-    if os.path.exists('%s.pub' % name) and os.path.exists('%s.prv' % name):
-        if sys.argv[2] == "1":
-            make_key_files(name, size)
-        else:
-            raise FileExistsError
-    else:
-        make_key_files(name, size)
+    if sys.argv[2] == "1":
+        write_to_files(sys.argv[3], sys.argv[4], size)
+        pass
+    make_key_files(name, size)
     # print("\n!!! THE PUBLIC AND PRIVATE KEYS HAVE BEEN GENERATED !!!\n"
     #       "\n!!! THEY HAVE BEEN STORED IN THE RESPECTIVE FILES IN THE SAME DIRECTORY !!!\n"
     #       "\n!!! KEEP THE PRIVATE KEY SAFE AND \"SECRET\" !!!\n"

@@ -1,11 +1,12 @@
 import ctypes
-import subprocess
+import sys
 from pathlib import Path
 from tkinter import *
 from tkinter import messagebox
+from Steganography_Tools_master import (crypt, genkeys)
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"D:\Dev\Python_Projects\Encryption Tool Windows\assets\frame0")
+ASSETS_PATH = OUTPUT_PATH / Path(r"D:\Dev\Python_Projects\Encryption_Tool_Windows\assets\frame0")
 
 
 def relative_to_assets(path: str) -> Path:
@@ -147,36 +148,41 @@ def perform_action():
 def generate_keys():
     name = perform_action()
     try:
-        subprocess.run(["python", "Steganography-Tools-master/genkeys.py", name, "0"], check=True,
-                       stderr=subprocess.PIPE)
-    except subprocess.CalledProcessError as e:
-        error_message = e.stderr.decode().strip()
-        if "Errno 2" in error_message:
-            messagebox.showerror("File Not Found!", "The Program for the generating the Key Files was NOT FOUND!")
-            return
-        if "Directory_Not_Selected" in error_message:
-            messagebox.showwarning("No Directory Selected!",
-                                   "You have not chosen any directory for saving the Key Files!")
-            return
-        elif "FileExistsError" in error_message:
-            confirm = messagebox.askyesno("Files Already Exist!",
-                                          "The Key Files for the Given Username already exist!\n"
-                                          "Do you want to OVERWRITE the Key Files?")
-            if confirm:
-                subprocess.run(["python", "Steganography-Tools-master/genkeys.py", name, "1"], check=True,
-                               stderr=subprocess.PIPE)
-            else:
+        # subprocess.run(["python", "Steganography_Tools_master/genkeys.py", name, "0"], check=True,
+        #                stderr=subprocess.PIPE)
+        if name is not None:
+            paths = genkeys.make_key_files(name).split("#path#")
+            # except subprocess.CalledProcessError as e:
+            #     error_message = e.stderr.decode().strip().split("#path#")
+            #     print(error_message)
+            # if "Errno 2" in error_message[0]:
+            #     messagebox.showerror("File Not Found!", "The Program for the generating the Key Files was NOT FOUND!")
+            #     return
+            if "directory_not_selected" in paths:
+                messagebox.showwarning("No Directory Selected!",
+                                       "You have not chosen any directory for saving the Key Files!")
                 return
-    except TypeError:
-        return
+            elif "FileExistsError" in paths:
+                confirm = messagebox.askyesno("Files Already Exist!",
+                                              "The Key Files for the Given Username already exist!\n"
+                                              "Do you want to OVERWRITE the Key Files?")
+                if confirm:
+                    # subprocess.run(
+                    # ["python", "Steganography_Tools_master/genkeys.py", name, "1", error_message[1],
+                    # error_message[2]],
+                    #     check=True,
+                    #     stderr=subprocess.PIPE)
+                    genkeys.write_to_files(paths[1], paths[2])
+                else:
+                    return
+            messagebox.showinfo("Keys Generated Successfully!",
+                                "\n Public and Private Key Files generated Successfully!\n"
+                                "\n Files have been stored in the Chosen Directory\n"
+                                "\n Keep the Private Key \"SAFE\" and \"SECRET\"\n"
+                                "\n Share Public Key to perform Encryption and Decryption")
     except Exception as e:
-        messagebox.showerror("Error!", "The Following Error was encountered : %s" % e)
+        messagebox.showerror("Error!", "The following Error was encountered : %s" % e)
         return
-    messagebox.showinfo("Keys Generated Successfully!",
-                        "\n Public and Private Key Files generated Successfully!\n"
-                        "\n Files have been stored in the Chosen Directory\n"
-                        "\n Keep the Private Key \"SAFE\" and \"SECRET\"\n"
-                        "\n Share Public Key to perform Encryption and Decryption")
 
 
 def erase_word(event):
@@ -282,5 +288,13 @@ canvas.create_text(
     fill="#071952",
     font=("Eloqua Display", 15 * 1)
 )
+
+
+def on_close():
+    window.destroy()
+    sys.exit(0)
+
+
 window.resizable(False, False)
+window.protocol("WM_DELETE_WINDOW", on_close)
 window.mainloop()
