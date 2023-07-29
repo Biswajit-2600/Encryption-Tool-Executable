@@ -2,7 +2,7 @@ import ctypes
 import sys
 from pathlib import Path
 from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from Steganography_Tools_master import (crypt, genkeys)
 
 OUTPUT_PATH = Path(__file__).parent
@@ -11,118 +11,6 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"D:\Dev\Python_Projects\Encryption_Tool_Window
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
-
-
-window = Tk()
-
-app_width = 800
-app_height = 600
-
-screen_height = window.winfo_screenheight()
-screen_width = window.winfo_screenwidth()
-
-x = (screen_width / 2) - (app_width / 2)
-y = (screen_height / 2) - (app_height / 2)
-
-custom_font = ("Helvetica", 15, "bold")
-
-window.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
-window.configure(bg="#FFFFFF")
-window.title('Encryption Tool')
-icon = PhotoImage(file="assets/favicon-32x32-black.png")
-window.iconphoto(True, icon)
-
-my_app_id = 'my_company.my_product.sub_product.version'  # arbitrary string
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(my_app_id)
-
-canvas = Canvas(
-    window,
-    bg="#FFFFFF",
-    height=600,
-    width=800,
-    bd=0,
-    highlightthickness=0,
-    relief="ridge"
-)
-
-canvas.place(x=0, y=0)
-image_image_1 = PhotoImage(
-    file=relative_to_assets("image_1.png"))
-image_1 = canvas.create_image(
-    400.0,
-    300.0,
-    image=image_image_1
-)
-
-canvas.create_text(
-    251.0,
-    30.0,
-    anchor="nw",
-    text="** WELCOME **",
-    fill="#CEE6F3",
-    font=("Inter Black", 36 * -1)
-)
-
-canvas.create_rectangle(
-    46.0,
-    79.0,
-    750.0,
-    83.0,
-    fill="#CEE6F3",
-    outline="")
-
-canvas.create_rectangle(
-    370.0,
-    128.0,
-    750.0,
-    418.0,
-    fill="#1D5D9B",
-    outline="#CEE6F3",
-    dash=(10, 10),
-    width=5
-)
-
-image_image_2 = PhotoImage(
-    file=relative_to_assets("image_2.png"))
-image_2 = canvas.create_image(
-    560.0,
-    251.0,
-    image=image_image_2
-)
-
-button_image_1 = PhotoImage(
-    file="assets/frame0/button_1.png")
-img_label = Label(image=button_image_1)
-
-button_1 = Button(
-    image=button_image_1,
-    borderwidth=0,
-    highlightthickness=0,
-    command=lambda: print("button_1 clicked"),
-    relief="flat"
-)
-button_1.place(
-    x=46.0,
-    y=360.0,
-    width=250.0,
-    height=55.0
-)
-
-button_image_2 = PhotoImage(
-    file=relative_to_assets("button_2.png"))
-button_2 = Button(
-    image=button_image_2,
-    borderwidth=0,
-    highlightthickness=0,
-    command=lambda: print("button_2 clicked"),
-    relief="flat"
-)
-button_2.place(
-    x=46.0,
-    y=292.0,
-    width=250.0,
-    height=55.0
-)
 
 
 def on_entry_focus_in(event):
@@ -185,6 +73,28 @@ def generate_keys():
         return
 
 
+def crypto():
+    try:
+        crypt.encrypt()
+    except:
+        pass
+
+
+def upload_change(path):
+    file_name = path.split("/")[-1]
+    print(file_name)
+    canvas.itemconfig(up_image, image=PhotoImage(file="assets/frame0/file_change.png"))
+    canvas.itemconfig(rectangle_text, text="File Uploaded : %s" % file_name, fill="#FF0000")
+
+
+def open_file_dialog(event):
+    selected_file = filedialog.askopenfilename()
+    if selected_file:
+        upload_change(selected_file)
+    else:
+        return "no_file_selected"
+
+
 def erase_word(event):
     text = entry.get()
 
@@ -195,8 +105,136 @@ def erase_word(event):
     entry.delete(index, INSERT)
 
 
+def create_rounded_rectangle(this_canvas, x1, y1, x2, y2, this_corner_radius, **kwargs):
+    this_canvas.create_arc(x1, y1, x1 + 2 * this_corner_radius, y1 + 2 * this_corner_radius,
+                           start=90, extent=90, **kwargs)
+    this_canvas.create_arc(x2 - 2 * this_corner_radius, y1, x2, y1 + 2 * this_corner_radius,
+                           start=0, extent=90, **kwargs)
+    this_canvas.create_arc(x1, y2 - 2 * this_corner_radius, x1 + 2 * this_corner_radius, y2,
+                           start=180, extent=90, **kwargs)
+    this_canvas.create_arc(x2 - 2 * this_corner_radius, y2 - 2 * this_corner_radius, x2, y2,
+                           start=270, extent=90, **kwargs)
+    this_canvas.create_rectangle(x1 + this_corner_radius, y1, x2 - this_corner_radius, y2, **kwargs)
+    this_canvas.create_rectangle(x1, y1 + this_corner_radius, x2, y2 - this_corner_radius, **kwargs)
+
+
+window = Tk()
+
+app_width = 800
+app_height = 600
+
+screen_height = window.winfo_screenheight()
+screen_width = window.winfo_screenwidth()
+
+x = (screen_width / 2) - (app_width / 2)
+y = (screen_height / 2) - (app_height / 2)
+
+custom_font = ("Helvetica", 15, "bold")
+
+window.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+window.configure(bg="#FFFFFF")
+window.title('Encryption Tool')
+icon = PhotoImage(file="assets/favicon-32x32-black.png")
+window.iconphoto(True, icon)
+
+my_app_id = 'my_company.my_product.sub_product.version'  # arbitrary string
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(my_app_id)
+
+canvas = Canvas(
+    window,
+    bg="#FFFFFF",
+    height=600,
+    width=800,
+    bd=0,
+    highlightthickness=0,
+    relief="ridge"
+)
+
+canvas.place(x=0, y=0)
+image_bg_image = PhotoImage(
+    file=relative_to_assets("bg_image.png"))
+bg_image = canvas.create_image(
+    400.0,
+    300.0,
+    image=image_bg_image
+)
+
+canvas.create_text(
+    251.0,
+    30.0,
+    anchor="nw",
+    text="** WELCOME **",
+    fill="#CEE6F3",
+    font=("Inter Black", 36 * -1)
+)
+
+canvas.create_rectangle(
+    46.0,
+    79.0,
+    750.0,
+    83.0,
+    fill="#CEE6F3",
+    outline="")
+
+rectangle = canvas.create_rectangle(
+    370.0,
+    128.0,
+    750.0,
+    418.0,
+    fill="#1D5D9B",
+    outline="#CEE6F3",
+    dash=(10, 10),
+    width=5
+)
+
+canvas.tag_bind(rectangle, '<Button-1>', open_file_dialog)
+
+image_up_image = PhotoImage(
+    file="assets/frame0/up_image.png")
+up_image = canvas.create_image(
+    560.0,
+    251.0,
+    image=image_up_image
+)
+
+canvas.tag_bind(up_image, '<Button-1>', open_file_dialog)
+
+button_image_1 = PhotoImage(
+    file="assets/frame0/decrypt_btn.png")
+img_label = Label(image=button_image_1)
+
+button_1 = Button(
+    image=button_image_1,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_1 clicked"),
+    relief="flat"
+)
+button_1.place(
+    x=46.0,
+    y=360.0,
+    width=250.0,
+    height=55.0
+)
+
+button_image_2 = PhotoImage(
+    file=relative_to_assets("encrypt_btn.png"))
+button_2 = Button(
+    image=button_image_2,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: crypto(),
+    relief="flat"
+)
+button_2.place(
+    x=46.0,
+    y=292.0,
+    width=250.0,
+    height=55.0
+)
+
 button_image_3 = PhotoImage(
-    file=relative_to_assets("button_3.png"))
+    file=relative_to_assets("gen_keys_btn.png"))
 button_3 = Button(
     image=button_image_3,
     borderwidth=0,
@@ -237,28 +275,16 @@ entry.bind("<FocusIn>", on_entry_focus_in)
 entry.bind("<FocusOut>", on_entry_focus_out)
 entry.bind("<Control-BackSpace>", erase_word)
 
-canvas.create_text(
+rectangle_text = canvas.create_text(
     415.0,
     352.0,
     anchor="nw",
-    text="Drag & Drop / Upload File",
+    text="Drag & Drop / Click to Upload File",
     fill="#CEE6F3",
-    font=("Inter Black", 25 * -1)
+    font=("Inter Black", 15 * 1)
 )
 
-
-def create_rounded_rectangle(this_canvas, x1, y1, x2, y2, this_corner_radius, **kwargs):
-    this_canvas.create_arc(x1, y1, x1 + 2 * this_corner_radius, y1 + 2 * this_corner_radius,
-                           start=90, extent=90, **kwargs)
-    this_canvas.create_arc(x2 - 2 * this_corner_radius, y1, x2, y1 + 2 * this_corner_radius,
-                           start=0, extent=90, **kwargs)
-    this_canvas.create_arc(x1, y2 - 2 * this_corner_radius, x1 + 2 * this_corner_radius, y2,
-                           start=180, extent=90, **kwargs)
-    this_canvas.create_arc(x2 - 2 * this_corner_radius, y2 - 2 * this_corner_radius, x2, y2,
-                           start=270, extent=90, **kwargs)
-    this_canvas.create_rectangle(x1 + this_corner_radius, y1, x2 - this_corner_radius, y2, **kwargs)
-    this_canvas.create_rectangle(x1, y1 + this_corner_radius, x2, y2 - this_corner_radius, **kwargs)
-
+canvas.tag_bind(rectangle_text, '<Button-1>', open_file_dialog)
 
 corner_radius = 20
 create_rounded_rectangle(
