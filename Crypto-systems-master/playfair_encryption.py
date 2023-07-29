@@ -119,7 +119,7 @@ def conversion(plain_text):
             continue
         #RULE:4 if letters are not on the same row or column,
         # replace with the letters on the same row respectively but
-        # at the other pair of corners of rectangle,
+        # at the other pair of corners of up_rectangle,
         # which is defined by the original pair
 
         i0=0

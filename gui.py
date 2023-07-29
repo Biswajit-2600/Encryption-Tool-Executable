@@ -1,5 +1,6 @@
 import ctypes
 import sys
+import webbrowser
 from pathlib import Path
 from tkinter import *
 from tkinter import messagebox, filedialog
@@ -31,6 +32,17 @@ def perform_action():
         return input_string
     else:
         messagebox.showwarning("No Username!", "Please enter a username to generate keys!")
+
+
+selected_file = False
+
+
+def validate_file():
+    global selected_file
+    if selected_file:
+        return selected_file
+    else:
+        messagebox.showwarning("No File!", "Please select a file to encrypt!")
 
 
 def generate_keys():
@@ -69,30 +81,51 @@ def generate_keys():
                                 "\n Keep the Private Key \"SAFE\" and \"SECRET\"\n"
                                 "\n Share Public Key to perform Encryption and Decryption")
     except Exception as e:
-        messagebox.showerror("Error!", "The following Error was encountered : %s" % e)
+        messagebox.showerror("Error!", "The following Error was encountered while generating keys: %s" % e)
         return
 
 
-def crypto():
+def encrypt_file():
+    up_file = validate_file()
     try:
-        crypt.encrypt()
-    except:
-        pass
+        if selected_file:
+            crypt.encrypt()
+    except Exception as e:
+        messagebox.showerror("Error!", "The following Error was encountered while encryption/decryption: %s" % e)
+        return
 
 
-def upload_change(path):
+def decrypt_file():
+    up_file = validate_file()
+    try:
+        if selected_file:
+            crypt.encrypt()
+    except Exception as e:
+        messagebox.showerror("Error!", "The following Error was encountered while encryption/decryption: %s" % e)
+        return
+
+
+def update_up_image(path):
     file_name = path.split("/")[-1]
-    print(file_name)
-    canvas.itemconfig(up_image, image=PhotoImage(file="assets/frame0/file_change.png"))
-    canvas.itemconfig(rectangle_text, text="File Uploaded : %s" % file_name, fill="#FF0000")
+    change_image = PhotoImage(
+        file="assets/frame0/file_change.png")
+    display_text = "File Selected : %s" % file_name
+    canvas.itemconfig(up_image, image=change_image)
+    canvas.change_image = change_image
+    canvas.itemconfig(up_rectangle_text, text=display_text, fill="#CEE6F3",
+                      font=("Inter Black", 15 * 1),
+                      width=300,
+                      justify=LEFT,
+                      tags="updated_text")
 
 
 def open_file_dialog(event):
+    global selected_file
     selected_file = filedialog.askopenfilename()
     if selected_file:
-        upload_change(selected_file)
+        update_up_image(selected_file)
     else:
-        return "no_file_selected"
+        messagebox.showwarning("No File Selected!", "You have not selected any file!")
 
 
 def erase_word(event):
@@ -116,6 +149,10 @@ def create_rounded_rectangle(this_canvas, x1, y1, x2, y2, this_corner_radius, **
                            start=270, extent=90, **kwargs)
     this_canvas.create_rectangle(x1 + this_corner_radius, y1, x2 - this_corner_radius, y2, **kwargs)
     this_canvas.create_rectangle(x1, y1 + this_corner_radius, x2, y2 - this_corner_radius, **kwargs)
+
+
+def open_link(event):
+    webbrowser.open("https://biswajit-2600.github.io/Encryption-Tool/")
 
 
 window = Tk()
@@ -176,7 +213,7 @@ canvas.create_rectangle(
     fill="#CEE6F3",
     outline="")
 
-rectangle = canvas.create_rectangle(
+up_rectangle = canvas.create_rectangle(
     370.0,
     128.0,
     750.0,
@@ -187,30 +224,34 @@ rectangle = canvas.create_rectangle(
     width=5
 )
 
-canvas.tag_bind(rectangle, '<Button-1>', open_file_dialog)
+canvas.tag_bind(up_rectangle, '<Enter>', lambda event: canvas.config(cursor="hand2"))
+canvas.tag_bind(up_rectangle, '<Leave>', lambda event: canvas.config(cursor=""))
+canvas.tag_bind(up_rectangle, '<Button-1>', open_file_dialog)
 
 image_up_image = PhotoImage(
     file="assets/frame0/up_image.png")
 up_image = canvas.create_image(
     560.0,
-    251.0,
+    230.0,
     image=image_up_image
 )
 
+canvas.tag_bind(up_image, '<Enter>', lambda event: canvas.config(cursor="hand2"))
+canvas.tag_bind(up_image, '<Leave>', lambda event: canvas.config(cursor=""))
 canvas.tag_bind(up_image, '<Button-1>', open_file_dialog)
 
 button_image_1 = PhotoImage(
     file="assets/frame0/decrypt_btn.png")
-img_label = Label(image=button_image_1)
 
-button_1 = Button(
+decrypt_btn = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_1 clicked"),
+    command=lambda: decrypt_file(),
+    cursor="hand2",
     relief="flat"
 )
-button_1.place(
+decrypt_btn.place(
     x=46.0,
     y=360.0,
     width=250.0,
@@ -219,14 +260,15 @@ button_1.place(
 
 button_image_2 = PhotoImage(
     file=relative_to_assets("encrypt_btn.png"))
-button_2 = Button(
+encrypt_btn = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: crypto(),
+    command=lambda: encrypt_file(),
+    cursor="hand2",
     relief="flat"
 )
-button_2.place(
+encrypt_btn.place(
     x=46.0,
     y=292.0,
     width=250.0,
@@ -235,14 +277,15 @@ button_2.place(
 
 button_image_3 = PhotoImage(
     file=relative_to_assets("gen_keys_btn.png"))
-button_3 = Button(
+gen_keys_btn = Button(
     image=button_image_3,
     borderwidth=0,
     highlightthickness=0,
     command=lambda: generate_keys(),
+    cursor="hand2",
     relief="flat"
 )
-button_3.place(
+gen_keys_btn.place(
     x=46.0,
     y=121.0,
     width=250.0,
@@ -275,16 +318,19 @@ entry.bind("<FocusIn>", on_entry_focus_in)
 entry.bind("<FocusOut>", on_entry_focus_out)
 entry.bind("<Control-BackSpace>", erase_word)
 
-rectangle_text = canvas.create_text(
+up_rectangle_text = canvas.create_text(
     415.0,
-    352.0,
+    330.0,
     anchor="nw",
     text="Drag & Drop / Click to Upload File",
     fill="#CEE6F3",
-    font=("Inter Black", 15 * 1)
+    font=("Inter Black", 15 * 1),
+    width=300
 )
 
-canvas.tag_bind(rectangle_text, '<Button-1>', open_file_dialog)
+canvas.tag_bind(up_rectangle_text, '<Enter>', lambda event: canvas.config(cursor="hand2"))
+canvas.tag_bind(up_rectangle_text, '<Leave>', lambda event: canvas.config(cursor=""))
+canvas.tag_bind(up_rectangle_text, '<Button-1>', open_file_dialog)
 
 corner_radius = 20
 create_rounded_rectangle(
@@ -310,10 +356,23 @@ canvas.create_text(
     200.0,
     530.0,
     anchor="nw",
-    text="To use the web version of this app, click here.",
+    text="To use the web version of this app, ",
     fill="#071952",
     font=("Eloqua Display", 15 * 1)
 )
+
+click_text = canvas.create_text(
+    512.0,
+    530.0,
+    anchor="nw",
+    text="click here.",
+    fill="#001AFF",
+    font=("Eloqua Display", 15 * 1)
+)
+
+canvas.tag_bind(click_text, '<Enter>', lambda event: canvas.config(cursor="hand2"))
+canvas.tag_bind(click_text, '<Leave>', lambda event: canvas.config(cursor=""))
+canvas.tag_bind(click_text, "<Button-1>", open_link)
 
 
 def on_close():
