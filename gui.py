@@ -96,13 +96,14 @@ def encrypt_file():
 
 
 def decrypt_file():
-    up_file = validate_file()
-    try:
-        if selected_file:
-            crypt.encrypt()
-    except Exception as e:
-        messagebox.showerror("Error!", "The following Error was encountered while encryption/decryption: %s" % e)
-        return
+    pass
+    # up_file = validate_file()
+    # try:
+    #     if selected_file:
+    #         crypt.encrypt()
+    # except Exception as e:
+    #     messagebox.showerror("Error!", "The following Error was encountered while encryption/decryption: %s" % e)
+    #     return
 
 
 def update_up_image(path):
