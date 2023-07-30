@@ -4,7 +4,7 @@ import sys
 import webbrowser
 from pathlib import Path
 from tkinter import *
-from tkinter import messagebox, filedialog
+from tkinter import messagebox, filedialog, simpledialog
 from Steganography_Tools_master import (crypt, genkeys)
 
 OUTPUT_PATH = Path(__file__).parent
@@ -36,6 +36,7 @@ def perform_action():
 
 
 selected_file = False
+key_selected_file = False
 
 
 def validate_file():
@@ -64,19 +65,37 @@ def make_key_files(user_name, key_size=1024):
         return ""
 
 
+def ask_input():
+    input_window = Tk()
+    input_window.title("Choose File!")
+    input_window_width = 500
+    input_window_height = 300
+
+    input_x = (screen_width / 2) - (input_window_width / 2)
+    input_y = (screen_height / 2) - (input_window_height / 2)
+
+    input_window.geometry(f'{input_window_width}x{input_window_height}+{int(input_x)}+{int(input_y)}')
+
+    label = Label(input_window, text="Choose File to Upload:\n1. File to Encrypt\n2. Key File",
+                  font=("Inter Black", 20 * -1))
+    label.pack()
+
+    this_entry = Entry(font=custom_font)
+    this_entry.place(x=175, y=80, width=160, height=20)
+
+    ok_button = Button(input_window, text="Ok")
+    ok_button.place(x=180, y=110, width=70, height=20)
+    cancel_button = Button(input_window, text="Cancel", command=lambda: input_window.destroy())
+    cancel_button.place(x=260, y=110, width=70, height=20)
+
+    return this_entry
+
+
 def generate_keys():
     name = perform_action()
     try:
-        # subprocess.run(["python", "Steganography_Tools_master/genkeys.py", name, "0"], check=True,
-        #                stderr=subprocess.PIPE)
         if name is not None:
             paths = make_key_files(name).split("#path#")
-            # except subprocess.CalledProcessError as e:
-            #     error_message = e.stderr.decode().strip().split("#path#")
-            #     print(error_message)
-            # if "Errno 2" in error_message[0]:
-            #     messagebox.showerror("File Not Found!", "The Program for the generating the Key Files was NOT FOUND!")
-            #     return
             if "directory_not_selected" in paths:
                 messagebox.showwarning("No Directory Selected!",
                                        "You have not chosen any directory for saving the Key Files!")
@@ -87,11 +106,6 @@ def generate_keys():
                                               "already exist in the Chosen Directory!\n"
                                               "Do you want to OVERWRITE the Key Files?")
                 if confirm:
-                    # subprocess.run(
-                    # ["python", "Steganography_Tools_master/genkeys.py", name, "1", error_message[1],
-                    # error_message[2]],
-                    #     check=True,
-                    #     stderr=subprocess.PIPE)
                     genkeys.write_to_files(paths[1], paths[2])
                 else:
                     return
@@ -107,9 +121,13 @@ def generate_keys():
 
 def encrypt_file():
     up_file = validate_file()
+
     try:
         if selected_file:
-            crypt.encrypt()
+            open_key_file_dialog()
+            canvas.update_idletasks()
+            # encrypt_val, file_type = crypt.encrypt(pub_key_path, up_file)
+            # crypt.stego_encrypt_choices(encrypt_val.hex(), file_type)
     except Exception as e:
         messagebox.showerror("Error!", "The following Error was encountered while encryption/decryption: %s" % e)
         return
@@ -126,11 +144,11 @@ def decrypt_file():
     #     return
 
 
-def update_up_image(path):
-    file_name = path.split("/")[-1]
+def update_upload_data(file_path):
+    file_name = file_path.split("/")[-1]
     change_image = PhotoImage(
         file="assets/frame0/file_change.png")
-    display_text = "File Selected : %s" % file_name
+    display_text = "File : %s" % file_name
     canvas.itemconfig(up_image, image=change_image)
     canvas.change_image = change_image
     canvas.itemconfig(up_rectangle_text, text=display_text, fill="#CEE6F3",
@@ -140,13 +158,54 @@ def update_up_image(path):
                       tags="updated_text")
 
 
-def open_file_dialog(event):
+def update_key_file_data(pub_file_path):
+    pub_file_name = pub_file_path.split("/")[-1]
+    canvas.itemconfig(key_file_text, text="Key File : %s" % pub_file_name, fill="#CEE6F3",
+                      font=("Inter Black", 15 * 1),
+                      width=300,
+                      justify=LEFT,
+                      tags="updated_text")
+
+
+def open_update_file_dialog():
     global selected_file
     selected_file = filedialog.askopenfilename()
     if selected_file:
-        update_up_image(selected_file)
+        update_upload_data(selected_file)
+
+
+def open_key_file_dialog():
+    global key_selected_file
+    if not key_selected_file:
+        messagebox.showinfo("Select File!", "Select the Public Key File!")
+        pub_key_path = filedialog.askopenfilename()
+        if pub_key_path:
+            update_key_file_data(pub_key_path)
+            return pub_key_path
+
+
+def open_file_dialog(event):
+    global selected_file
+    if not selected_file or not key_selected_file:
+        user_input = ask_input()
+        print(user_input)
+        if user_input == 1:
+            selected_file = filedialog.askopenfilename()
+            if selected_file:
+                update_upload_data(selected_file)
+            else:
+                messagebox.showwarning("No File Selected!", "You have not selected any file!")
+        elif user_input == 2:
+            open_key_file_dialog()
+        else:
+            messagebox.showwarning("Wrong Input!", "Input does NOT match any of the choices!")
+            return
+
     else:
-        messagebox.showwarning("No File Selected!", "You have not selected any file!")
+        confirm_new_file = messagebox.askyesno("Files Already Selected!",
+                                               "Files have already been selected.\nDo you want to select Another File?")
+        if confirm_new_file:
+            open_update_file_dialog()
 
 
 def erase_word(event):
@@ -345,14 +404,28 @@ entry.bind("<FocusOut>", on_entry_focus_out)
 entry.bind("<Control-BackSpace>", erase_word)
 
 up_rectangle_text = canvas.create_text(
-    415.0,
-    330.0,
+    400.0,
+    310.0,
     anchor="nw",
     text="Drag & Drop / Click to Upload File",
     fill="#CEE6F3",
     font=("Inter Black", 15 * 1),
     width=300
 )
+
+key_file_text = canvas.create_text(
+    400.0,
+    370.0,
+    anchor="nw",
+    text="",
+    fill="#CEE6F3",
+    font=("Inter Black", 15 * 1),
+    width=300
+)
+
+canvas.tag_bind(key_file_text, '<Enter>', lambda event: canvas.config(cursor="hand2"))
+canvas.tag_bind(key_file_text, '<Leave>', lambda event: canvas.config(cursor=""))
+canvas.tag_bind(key_file_text, '<Button-1>', open_file_dialog)
 
 canvas.tag_bind(up_rectangle_text, '<Enter>', lambda event: canvas.config(cursor="hand2"))
 canvas.tag_bind(up_rectangle_text, '<Leave>', lambda event: canvas.config(cursor=""))
@@ -379,7 +452,7 @@ canvas.create_text(
 )
 
 canvas.create_text(
-    200.0,
+    190.0,
     530.0,
     anchor="nw",
     text="To use the Web Version of this app, ",
@@ -388,7 +461,7 @@ canvas.create_text(
 )
 
 click_text = canvas.create_text(
-    520.0,
+    510.0,
     530.0,
     anchor="nw",
     text="click here.",

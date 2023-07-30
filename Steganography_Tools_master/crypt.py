@@ -443,9 +443,9 @@ def decode_vid_data():
     return final_message
 
 
-def encrypt():
-    pub_key = input("\nEnter PUBLIC KEY file name (!! WITH EXTENSION !!) : ")
-    plain_text = input("\nEnter PATH of file TO BE ENCRYPTED : ")
+def encrypt(pub_key_file, up_file):
+    pub_key = pub_key_file
+    plain_text = up_file
     msg_type = plain_text.split(".")[-1]
     n, e = open(pub_key, 'r').read().split(',')
     plain_text = open(plain_text, 'rb').read()
