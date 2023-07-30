@@ -1,4 +1,5 @@
 import ctypes
+import os
 import sys
 import webbrowser
 from pathlib import Path
@@ -45,13 +46,31 @@ def validate_file():
         messagebox.showwarning("No File!", "Please select a file to encrypt!")
 
 
+def make_key_files(user_name, key_size=1024):
+    directory_window = Tk()
+    directory_window.withdraw()
+
+    selected_directory = filedialog.askdirectory()
+    if not selected_directory:
+        return "directory_not_selected"
+
+    pub_file_path = f"{selected_directory}/{user_name}.pub"
+    prv_file_path = f"{selected_directory}/{user_name}.prv"
+
+    if os.path.exists(pub_file_path) and os.path.exists(prv_file_path):
+        return "FileExistsError#path#%s#path#%s" % (pub_file_path, prv_file_path)
+    else:
+        genkeys.write_to_files(pub_file_path, prv_file_path, key_size)
+        return ""
+
+
 def generate_keys():
     name = perform_action()
     try:
         # subprocess.run(["python", "Steganography_Tools_master/genkeys.py", name, "0"], check=True,
         #                stderr=subprocess.PIPE)
         if name is not None:
-            paths = genkeys.make_key_files(name).split("#path#")
+            paths = make_key_files(name).split("#path#")
             # except subprocess.CalledProcessError as e:
             #     error_message = e.stderr.decode().strip().split("#path#")
             #     print(error_message)
@@ -64,7 +83,8 @@ def generate_keys():
                 return
             elif "FileExistsError" in paths:
                 confirm = messagebox.askyesno("Files Already Exist!",
-                                              "The Key Files for the Given Username already exist!\n"
+                                              "The Key Files for the Given Username "
+                                              "already exist in the Chosen Directory!\n"
                                               "Do you want to OVERWRITE the Key Files?")
                 if confirm:
                     # subprocess.run(
@@ -154,6 +174,11 @@ def create_rounded_rectangle(this_canvas, x1, y1, x2, y2, this_corner_radius, **
 
 def open_link(event):
     webbrowser.open("https://biswajit-2600.github.io/Encryption-Tool/")
+
+
+def on_close():
+    window.destroy()
+    sys.exit(0)
 
 
 window = Tk()
@@ -345,10 +370,10 @@ create_rounded_rectangle(
     outline="")
 
 canvas.create_text(
-    170.0,
+    225.0,
     500.0,
     anchor="nw",
-    text="The Decrypted File will be saved in the chosen folder.",
+    text="GUI design by Biswajit Panda \u00A9 2023.",
     fill="#071952",
     font=("Eloqua Display", 15 * 1)
 )
@@ -357,13 +382,13 @@ canvas.create_text(
     200.0,
     530.0,
     anchor="nw",
-    text="To use the web version of this app, ",
+    text="To use the Web Version of this app, ",
     fill="#071952",
     font=("Eloqua Display", 15 * 1)
 )
 
 click_text = canvas.create_text(
-    512.0,
+    520.0,
     530.0,
     anchor="nw",
     text="click here.",
@@ -374,12 +399,6 @@ click_text = canvas.create_text(
 canvas.tag_bind(click_text, '<Enter>', lambda event: canvas.config(cursor="hand2"))
 canvas.tag_bind(click_text, '<Leave>', lambda event: canvas.config(cursor=""))
 canvas.tag_bind(click_text, "<Button-1>", open_link)
-
-
-def on_close():
-    window.destroy()
-    sys.exit(0)
-
 
 window.resizable(False, False)
 window.protocol("WM_DELETE_WINDOW", on_close)

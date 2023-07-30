@@ -1,8 +1,4 @@
-import os.path
 import random
-import sys
-from tkinter import *
-from tkinter import filedialog
 
 
 def gcd(a, b):
@@ -98,35 +94,16 @@ def write_to_files(public_path, private_path, key_size=1024):
     prv_key.write('%s,%s' % (private_key[0], private_key[1]))
     prv_key.close()
 
-
-def make_key_files(user_name, key_size=1024):
-    directory_window = Tk()
-    directory_window.withdraw()
-
-    selected_directory = filedialog.askdirectory()
-    if not selected_directory:
-        return "directory_not_selected"
-
-    pub_file_path = f"{selected_directory}/{user_name}.pub"
-    prv_file_path = f"{selected_directory}/{user_name}.prv"
-
-    if os.path.exists(pub_file_path) and os.path.exists(prv_file_path):
-        return "FileExistsError#path#%s#path#%s" % (pub_file_path, prv_file_path)
-    else:
-        write_to_files(pub_file_path, prv_file_path, key_size)
-        return ""
-
-
-if __name__ == '__main__':
-    size = 1024
-    name = ""
-    if len(sys.argv) > 1:
-        name = sys.argv[1]
-    if sys.argv[2] == "1":
-        write_to_files(sys.argv[3], sys.argv[4], size)
-        pass
-    make_key_files(name, size)
-    # print("\n!!! THE PUBLIC AND PRIVATE KEYS HAVE BEEN GENERATED !!!\n"
-    #       "\n!!! THEY HAVE BEEN STORED IN THE RESPECTIVE FILES IN THE SAME DIRECTORY !!!\n"
-    #       "\n!!! KEEP THE PRIVATE KEY SAFE AND \"SECRET\" !!!\n"
-    #       "\n!!! YOU CAN SHARE THE PUBLIC KEY TO ANYONE TO PERFORM THE ENCRYPTION !!!")
+# if __name__ == '__main__':
+#     size = 1024
+#     name = ""
+#     if len(sys.argv) > 1:
+#         name = sys.argv[1]
+#     if sys.argv[2] == "1":
+#         write_to_files(sys.argv[3], sys.argv[4], size)
+#         pass
+#     make_key_files(name, size)
+# print("\n!!! THE PUBLIC AND PRIVATE KEYS HAVE BEEN GENERATED !!!\n"
+#       "\n!!! THEY HAVE BEEN STORED IN THE RESPECTIVE FILES IN THE SAME DIRECTORY !!!\n"
+#       "\n!!! KEEP THE PRIVATE KEY SAFE AND \"SECRET\" !!!\n"
+#       "\n!!! YOU CAN SHARE THE PUBLIC KEY TO ANYONE TO PERFORM THE ENCRYPTION !!!")
