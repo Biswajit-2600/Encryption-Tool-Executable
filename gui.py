@@ -4,7 +4,7 @@ import sys
 import webbrowser
 from pathlib import Path
 from tkinter import *
-from tkinter import messagebox, filedialog, simpledialog
+from tkinter import messagebox, filedialog
 from Steganography_Tools_master import (crypt, genkeys)
 
 OUTPUT_PATH = Path(__file__).parent
@@ -33,6 +33,16 @@ def perform_action():
         return input_string
     else:
         messagebox.showwarning("No Username!", "Please enter a username to generate keys!")
+
+
+def perform_pop_up_action(this_entry, this_window):
+    input_string = this_entry.get()
+    if input_string and input_string != placeholder_text:
+        return input_string
+    else:
+        messagebox.showwarning("Empty Input!", "Please enter a Choice!")
+        this_window.destroy()
+        ask_input()
 
 
 selected_file = False
@@ -65,6 +75,23 @@ def make_key_files(user_name, key_size=1024):
         return ""
 
 
+def register_file_choice(this_entry, this_window):
+    global selected_file
+    choice = perform_pop_up_action(this_entry, this_window)
+    this_window.destroy()
+    if choice == "1":
+        selected_file = filedialog.askopenfilename(title="Choose File!")
+        if selected_file:
+            update_upload_data(selected_file)
+        else:
+            messagebox.showwarning("No File Selected!", "You have not selected any file!")
+    elif choice == "2":
+        open_key_file_dialog()
+    else:
+        messagebox.showwarning("Wrong Input!", "Input does NOT match any of the choices!")
+        return
+
+
 def ask_input():
     input_window = Tk()
     input_window.title("Choose File!")
@@ -80,15 +107,14 @@ def ask_input():
                   font=("Inter Black", 20 * -1))
     label.pack()
 
-    this_entry = Entry(font=custom_font)
+    this_entry = Entry(input_window, font=custom_font)
     this_entry.place(x=175, y=80, width=160, height=20)
-
-    ok_button = Button(input_window, text="Ok")
+    ok_button = Button(input_window, text="Ok", command=lambda: register_file_choice(this_entry, input_window))
     ok_button.place(x=180, y=110, width=70, height=20)
     cancel_button = Button(input_window, text="Cancel", command=lambda: input_window.destroy())
     cancel_button.place(x=260, y=110, width=70, height=20)
 
-    return this_entry
+    input_window.mainloop()
 
 
 def generate_keys():
@@ -121,13 +147,15 @@ def generate_keys():
 
 def encrypt_file():
     up_file = validate_file()
+    pub_key_path = key_selected_file
 
     try:
-        if selected_file:
-            open_key_file_dialog()
+        if selected_file and key_selected_file:
             canvas.update_idletasks()
-            # encrypt_val, file_type = crypt.encrypt(pub_key_path, up_file)
-            # crypt.stego_encrypt_choices(encrypt_val.hex(), file_type)
+            encrypt_val, file_type = crypt.encrypt(pub_key_path, up_file)
+            crypt.stego_encrypt_choices(encrypt_val.hex(), file_type)
+        else:
+            messagebox.showwarning("No Key File!", "Please provide the Key File!")
     except Exception as e:
         messagebox.showerror("Error!", "The following Error was encountered while encryption/decryption: %s" % e)
         return
@@ -169,7 +197,7 @@ def update_key_file_data(pub_file_path):
 
 def open_update_file_dialog():
     global selected_file
-    selected_file = filedialog.askopenfilename()
+    selected_file = filedialog.askopenfilename(title="Choose File!")
     if selected_file:
         update_upload_data(selected_file)
 
@@ -177,8 +205,8 @@ def open_update_file_dialog():
 def open_key_file_dialog():
     global key_selected_file
     if not key_selected_file:
-        messagebox.showinfo("Select File!", "Select the Public Key File!")
-        pub_key_path = filedialog.askopenfilename()
+        pub_key_path = filedialog.askopenfilename(title="Choose Key File!")
+        key_selected_file = pub_key_path
         if pub_key_path:
             update_key_file_data(pub_key_path)
             return pub_key_path
@@ -187,25 +215,12 @@ def open_key_file_dialog():
 def open_file_dialog(event):
     global selected_file
     if not selected_file or not key_selected_file:
-        user_input = ask_input()
-        print(user_input)
-        if user_input == 1:
-            selected_file = filedialog.askopenfilename()
-            if selected_file:
-                update_upload_data(selected_file)
-            else:
-                messagebox.showwarning("No File Selected!", "You have not selected any file!")
-        elif user_input == 2:
-            open_key_file_dialog()
-        else:
-            messagebox.showwarning("Wrong Input!", "Input does NOT match any of the choices!")
-            return
-
+        ask_input()
     else:
         confirm_new_file = messagebox.askyesno("Files Already Selected!",
                                                "Files have already been selected.\nDo you want to select Another File?")
         if confirm_new_file:
-            open_update_file_dialog()
+            ask_input()
 
 
 def erase_word(event):
