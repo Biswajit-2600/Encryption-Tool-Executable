@@ -99,22 +99,22 @@ def register_stego_choice(this_entry, this_window, val, file_type):
         messagebox.showinfo("Select File!", "Select Image File in which data is to be encrypted!")
         stego_img_file = filedialog.askopenfilename(title="Select File!")
         crypt.encode_img_data(val, file_type, stego_img_file)
-        messagebox.showinfo("Success!", "Message successfully Decrypted!")
+        messagebox.showinfo("Success!", "Message successfully Encrypted!")
     elif choice == "2":
         messagebox.showinfo("Select File!", "Select Text File in which data is to be encrypted!")
         stego_txt_file = filedialog.askopenfilename(title="Select File!")
         crypt.encode_txt_data(val, file_type, stego_txt_file)
-        messagebox.showinfo("Success!", "Message successfully Decrypted!")
+        messagebox.showinfo("Success!", "Message successfully Encrypted!")
     elif choice == "3":
         messagebox.showinfo("Select File!", "Select Audio File in which data is to be encrypted!")
         stego_aud_file = filedialog.askopenfilename(title="Select File!")
         crypt.encode_aud_data(val, file_type, stego_aud_file)
-        messagebox.showinfo("Success!", "Message successfully Decrypted!")
+        messagebox.showinfo("Success!", "Message successfully Encrypted!")
     elif choice == "4":
         messagebox.showinfo("Select File!", "Select Video File in which data is to be encrypted!")
         stego_vid_file = filedialog.askopenfilename(title="Select File!")
         crypt.encode_vid_data(val, file_type, stego_vid_file)
-        messagebox.showinfo("Success!", "Message successfully Decrypted!")
+        messagebox.showinfo("Success!", "Message successfully Encrypted!")
     else:
         messagebox.showwarning("Wrong Input!", "Input does NOT match any of the choices!")
         register_file_choice(this_entry, this_window)
@@ -212,7 +212,6 @@ def encrypt_file():
             canvas.update_idletasks()
             encrypt_val, file_type = crypt.encrypt(pub_key_path, up_file)
             ask_stego_choice(encrypt_val.hex(), file_type)
-            crypt.stego_encrypt_choices(encrypt_val.hex(), file_type)
         else:
             messagebox.showwarning("No Key File!", "Please provide the Key File!")
     except Exception as e:
@@ -221,14 +220,13 @@ def encrypt_file():
 
 
 def decrypt_file():
-    pass
-    # up_file = validate_file()
-    # try:
-    #     if selected_file:
-    #         crypt.encrypt()
-    # except Exception as e:
-    #     messagebox.showerror("Error!", "The following Error was encountered while encryption/decryption: %s" % e)
-    #     return
+    up_file = validate_file()
+    try:
+        if selected_file:
+            crypt.encrypt()
+    except Exception as e:
+        messagebox.showerror("Error!", "The following Error was encountered while encryption/decryption: %s" % e)
+        return
 
 
 def update_upload_data(file_path):
