@@ -55,9 +55,9 @@ def txt_encode(text, text_cover_file):
     print("\nData successfully stored in the file : %s" % name_of_file)
 
 
-def encode_txt_data(msg, file_type):
+def encode_txt_data(msg, file_type, path):
     count2 = 0
-    cover_file = input("\nEnter name of text file in which you want to encode the data : ")
+    cover_file = path
     textfile = open(cover_file, "r")
     for line in textfile:
         for _ in line.split():
@@ -135,8 +135,8 @@ def msg_to_binary(msg):
     return result
 
 
-def encode_img_data(msg, file_type):
-    img = cv2.imread(input("\nEnter PATH of image in which data is to be encrypted : "))
+def encode_img_data(msg, file_type, path):
+    img = cv2.imread(path)
     data = msg + ("#type#%s" % file_type)
     if len(data) == 0:
         raise ValueError('Data entered to be encoded is empty')
@@ -198,8 +198,8 @@ def decode_img_data():
                     return decoded_data[:-5]
 
 
-def encode_aud_data(msg, file_type):
-    name_of_file = input("\nEnter name of the file (!! WITH EXTENSION !!) in which message is to be encoded : ")
+def encode_aud_data(msg, file_type, path):
+    name_of_file = path
     song = wave.open(name_of_file, mode='rb')
 
     n_frames = song.getnframes()
@@ -369,8 +369,8 @@ def extract(frame, key):
                     return final_decoded_msg
 
 
-def encode_vid_data(msg, file_type):
-    cover_video = input("\nEnter the video file (!! WITH EXTENSION !!) in which you want to encode data : ")
+def encode_vid_data(msg, file_type, path):
+    cover_video = path
     cap = cv2.VideoCapture(cover_video)
     vid_cap = cv2.VideoCapture(cover_video)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -476,51 +476,6 @@ def decrypt(encoded_message):
     print("\nData has been decrypted successfully and stored in the file : %s" % plain_text)
 
 
-def main():
-    while True:
-        print("\n***** WELCOME TO THE ENCRYPTION TOOL *****\n"
-              "\n***** ENCRYPT YOUR DATA USING RSA + AES + STEGANOGRAPHY *****\n"
-              "\n!!! IF YOU DON'T HAVE YOUR KEYS, PLEASE GENERATE THEM BEFORE PROCEEDING !!!\n"
-              "\n***** CHOOSE FROM THE OPTIONS BELOW *****\n"
-              "\n1. ENCRYPT"
-              "\n2. DECRYPT"
-              "\n3. EXIT")
-
-        crypt_choice = int(input("\nEnter Your Choice : "))
-        if crypt_choice == 1:
-            encrypt_val, file_type = encrypt()
-            stego_encrypt_choices(encrypt_val.hex(), file_type)
-        elif crypt_choice == 2:
-            encoded_data = stego_decrypt_choices()
-            decrypt(encoded_data)
-        elif crypt_choice == 3:
-            print("\n***** THANK YOU FOR USING THE TOOL *****")
-            break
-        else:
-            print("\nIncorrect Choice\n")
-
-
-def stego_encrypt_choices(enc, file_type):
-    print("\n***** CHOOSE THE STEGANOGRAPHY TECHNIQUE *****\n"
-          "\n1. IMAGE STEGANOGRAPHY {Hiding Data in Image cover file}"
-          "\n2. TEXT STEGANOGRAPHY {Hiding Data in Text cover file}"
-          "\n3. AUDIO STEGANOGRAPHY {Hiding Data in Audio cover file}"
-          "\n4. VIDEO STEGANOGRAPHY {Hiding Data in Video cover file}")
-
-    stego_choice = int(input("\nEnter Your Choice: "))
-    if stego_choice == 1:
-        encode_img_data(enc, file_type)
-    elif stego_choice == 2:
-        encode_txt_data(enc, file_type)
-    elif stego_choice == 3:
-        encode_aud_data(enc, file_type)
-    elif stego_choice == 4:
-        encode_vid_data(enc, file_type)
-    else:
-        print("\nIncorrect Choice\n")
-        stego_encrypt_choices(enc, file_type)
-
-
 def stego_decrypt_choices():
     print("\n***** CHOOSE THE STEGANOGRAPHY TECHNIQUE *****\n"
           "\n1. IMAGE STEGANOGRAPHY {Hiding Data in Image cover file}"
@@ -540,7 +495,3 @@ def stego_decrypt_choices():
     else:
         print("\nIncorrect Choice\n")
         stego_decrypt_choices()
-
-
-if __name__ == "__main__":
-    main()
