@@ -42,19 +42,28 @@ def perform_pop_up_action(this_entry, this_window):
     else:
         messagebox.showwarning("Empty Input!", "Please enter a Choice!")
         this_window.destroy()
-        ask_file_choice()
+        ask_file_choice_encrypt()
 
 
 selected_file = False
 key_selected_file = False
+saving_directory = False
 
 
-def validate_file():
+def validate_file_encrypt():
     global selected_file
     if selected_file:
         return selected_file
     else:
-        messagebox.showwarning("No File!", "Please select a file to encrypt!")
+        messagebox.showwarning("No File!", "Please select a file to Encrypt!")
+
+
+def validate_file_decrypt():
+    global selected_file
+    if selected_file:
+        return selected_file
+    else:
+        messagebox.showwarning("No File!", "Please select a file to Decrypt!")
 
 
 def make_key_files(user_name, key_size=1024):
@@ -92,35 +101,36 @@ def register_file_choice(this_entry, this_window):
         register_file_choice(this_entry, this_window)
 
 
-def register_stego_choice(this_entry, this_window, val, file_type):
+def register_stego_choice_encrypt(this_entry, this_window, val, file_type):
     choice = perform_pop_up_action(this_entry, this_window)
     this_window.destroy()
     if choice == "1":
-        messagebox.showinfo("Select File!", "Select Image File in which data is to be encrypted!")
+        messagebox.showinfo("Select File!", "Select Image File in which data is to be Encrypted!")
         stego_img_file = filedialog.askopenfilename(title="Select File!")
         crypt.encode_img_data(val, file_type, stego_img_file)
-        messagebox.showinfo("Success!", "Message successfully Encrypted!")
+        messagebox.showinfo("Success!", "Message Encrypted Successfully!")
     elif choice == "2":
-        messagebox.showinfo("Select File!", "Select Text File in which data is to be encrypted!")
+        messagebox.showinfo("Select File!", "Select Text File in which data is to be Encrypted!")
         stego_txt_file = filedialog.askopenfilename(title="Select File!")
         crypt.encode_txt_data(val, file_type, stego_txt_file)
-        messagebox.showinfo("Success!", "Message successfully Encrypted!")
+        crypt.encode_txt_data(val, file_type, stego_txt_file)
+        messagebox.showinfo("Success!", "Message Encrypted Successfully!")
     elif choice == "3":
-        messagebox.showinfo("Select File!", "Select Audio File in which data is to be encrypted!")
+        messagebox.showinfo("Select File!", "Select Audio File in which data is to be Encrypted!")
         stego_aud_file = filedialog.askopenfilename(title="Select File!")
         crypt.encode_aud_data(val, file_type, stego_aud_file)
-        messagebox.showinfo("Success!", "Message successfully Encrypted!")
+        messagebox.showinfo("Success!", "Message Encrypted Successfully!")
     elif choice == "4":
-        messagebox.showinfo("Select File!", "Select Video File in which data is to be encrypted!")
+        messagebox.showinfo("Select File!", "Select Video File in which data is to be Encrypted!")
         stego_vid_file = filedialog.askopenfilename(title="Select File!")
         crypt.encode_vid_data(val, file_type, stego_vid_file)
-        messagebox.showinfo("Success!", "Message successfully Encrypted!")
+        messagebox.showinfo("Success!", "Message Encrypted Successfully!")
     else:
         messagebox.showwarning("Wrong Input!", "Input does NOT match any of the choices!")
         register_file_choice(this_entry, this_window)
 
 
-def ask_file_choice():
+def ask_file_choice_encrypt():
     input_window = Tk()
     input_window.title("Choose File!")
     input_window_width = 500
@@ -131,7 +141,7 @@ def ask_file_choice():
 
     input_window.geometry(f'{input_window_width}x{input_window_height}+{int(input_x)}+{int(input_y)}')
 
-    label = Label(input_window, text="Choose File to Upload:\n1. File to Encrypt\n2. Key File",
+    label = Label(input_window, text="Choose File to Upload:\n1. File to Encrypt/Decrypt\n2. Key File",
                   font=("Inter Black", 20 * -1))
     label.pack()
 
@@ -145,7 +155,7 @@ def ask_file_choice():
     input_window.mainloop()
 
 
-def ask_stego_choice(val, file_type):
+def ask_stego_choice_encrypt(val, file_type):
     input_window = Tk()
     input_window.title("Choose File!")
     input_window_width = 500
@@ -167,7 +177,86 @@ def ask_stego_choice(val, file_type):
     this_entry = Entry(input_window, font=custom_font)
     this_entry.place(x=175, y=120, width=160, height=20)
     ok_button = Button(input_window, text="Ok",
-                       command=lambda: register_stego_choice(this_entry, input_window, val, file_type))
+                       command=lambda: register_stego_choice_encrypt(this_entry, input_window, val, file_type))
+    ok_button.place(x=180, y=150, width=70, height=20)
+    cancel_button = Button(input_window, text="Cancel", command=lambda: input_window.destroy())
+    cancel_button.place(x=260, y=150, width=70, height=20)
+
+    input_window.mainloop()
+
+
+def register_stego_choice_decrypt(this_entry, this_window):
+    choice = perform_pop_up_action(this_entry, this_window)
+    this_window.destroy()
+    if choice == "1":
+        stego_img_file = selected_file
+        crypt.decrypt(crypt.decode_img_data(stego_img_file), key_selected_file)
+        messagebox.showinfo("Success!", "Message Decrypted Successfully!")
+    elif choice == "2":
+        stego_txt_file = selected_file
+        crypt.decrypt(crypt.decode_txt_data(stego_txt_file), key_selected_file)
+        messagebox.showinfo("Success!", "Message Decrypted Successfully!")
+    elif choice == "3":
+        stego_aud_file = selected_file
+        crypt.decrypt(crypt.decode_aud_data(stego_aud_file), key_selected_file)
+        messagebox.showinfo("Success!", "Message Decrypted Successfully!")
+    elif choice == "4":
+        stego_vid_file = selected_file
+        crypt.decrypt(crypt.decode_vid_data(stego_vid_file), key_selected_file)
+        messagebox.showinfo("Success!", "Message Decrypted Successfully!")
+    else:
+        messagebox.showwarning("Wrong Input!", "Input does NOT match any of the choices!")
+        register_file_choice(this_entry, this_window)
+
+
+def ask_file_choice_decrypt():
+    input_window = Tk()
+    input_window.title("Choose File!")
+    input_window_width = 500
+    input_window_height = 300
+
+    input_x = (screen_width / 2) - (input_window_width / 2)
+    input_y = (screen_height / 2) - (input_window_height / 2)
+
+    input_window.geometry(f'{input_window_width}x{input_window_height}+{int(input_x)}+{int(input_y)}')
+
+    label = Label(input_window, text="Choose File to Upload:\n1. File to Encrypt\n2. Key File",
+                  font=("Inter Black", 20 * -1))
+    label.pack()
+
+    this_entry = Entry(input_window, font=custom_font)
+    this_entry.place(x=175, y=80, width=160, height=20)
+    ok_button = Button(input_window, text="Ok", command=lambda: register_stego_choice_decrypt(this_entry, input_window))
+    ok_button.place(x=180, y=110, width=70, height=20)
+    cancel_button = Button(input_window, text="Cancel", command=lambda: input_window.destroy())
+    cancel_button.place(x=260, y=110, width=70, height=20)
+
+    input_window.mainloop()
+
+
+def ask_stego_choice_decrypt():
+    input_window = Tk()
+    input_window.title("Choose File!")
+    input_window_width = 500
+    input_window_height = 300
+
+    input_x = (screen_width / 2) - (input_window_width / 2)
+    input_y = (screen_height / 2) - (input_window_height / 2)
+
+    input_window.geometry(f'{input_window_width}x{input_window_height}+{int(input_x)}+{int(input_y)}')
+
+    label = Label(input_window, text="***** CHOOSE THE STEGANOGRAPHY TECHNIQUE *****\n"
+                                     "\n1. IMAGE STEGANOGRAPHY {Hiding Data in Image cover file}"
+                                     "\n2. TEXT STEGANOGRAPHY {Hiding Data in Text cover file}"
+                                     "\n3. AUDIO STEGANOGRAPHY {Hiding Data in Audio cover file}"
+                                     "\n4. VIDEO STEGANOGRAPHY {Hiding Data in Video cover file}",
+                  font=("Inter Black", 15 * -1))
+    label.pack()
+
+    this_entry = Entry(input_window, font=custom_font)
+    this_entry.place(x=175, y=120, width=160, height=20)
+    ok_button = Button(input_window, text="Ok",
+                       command=lambda: register_stego_choice_decrypt(this_entry, input_window))
     ok_button.place(x=180, y=150, width=70, height=20)
     cancel_button = Button(input_window, text="Cancel", command=lambda: input_window.destroy())
     cancel_button.place(x=260, y=150, width=70, height=20)
@@ -204,26 +293,32 @@ def generate_keys():
 
 
 def encrypt_file():
-    up_file = validate_file()
+    global selected_file, key_selected_file
+    up_file = validate_file_encrypt()
     pub_key_path = key_selected_file
 
     try:
         if selected_file and key_selected_file:
             canvas.update_idletasks()
             encrypt_val, file_type = crypt.encrypt(pub_key_path, up_file)
-            ask_stego_choice(encrypt_val.hex(), file_type)
+            ask_stego_choice_encrypt(encrypt_val.hex(), file_type)
+            selected_file = False
+            key_selected_file = False
         else:
-            messagebox.showwarning("No Key File!", "Please provide the Key File!")
+            messagebox.showwarning("No Key File!", "Please provide the Public Key File!")
     except Exception as e:
         messagebox.showerror("Error!", "The following Error was encountered while encryption/decryption: %s" % e)
         return
 
 
 def decrypt_file():
-    up_file = validate_file()
+    validate_file_decrypt()
     try:
-        if selected_file:
-            crypt.encrypt()
+        if selected_file and key_selected_file:
+            canvas.update_idletasks()
+            ask_stego_choice_decrypt()
+        else:
+            messagebox.showwarning("No Key File!", "Please provide the Private Key File!")
     except Exception as e:
         messagebox.showerror("Error!", "The following Error was encountered while encryption/decryption: %s" % e)
         return
@@ -272,13 +367,13 @@ def open_key_file_dialog():
 def open_file_dialog(event):
     global selected_file
     if not selected_file or not key_selected_file:
-        ask_file_choice()
+        ask_file_choice_encrypt()
     else:
         confirm_new_file = messagebox.askyesno("Files Already Selected!",
                                                "Files have already been selected.\n"
                                                "Do you want to select Another File?")
         if confirm_new_file:
-            ask_file_choice()
+            ask_file_choice_encrypt()
 
 
 def erase_word(event):

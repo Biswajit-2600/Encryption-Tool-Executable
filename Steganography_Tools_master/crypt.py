@@ -81,9 +81,9 @@ def binary_to_decimal(binary):
     return string
 
 
-def decode_txt_data():
+def decode_txt_data(path):
     zwc_reverse = {u'\u200C': "00", u'\u202C': "01", u'\u202D': "11", u'\u200E': "10"}
-    stego = input("\nEnter the PATH of stego TEXT file (!! WITH EXTENSION !!) to decode the message : ")
+    stego = path
     file4 = open(stego, "r", encoding="utf-8")
     temp = ''
     for line in file4:
@@ -181,8 +181,8 @@ def encode_img_data(msg, file_type, path):
     print("\nEncoded the data successfully in the Image and it is successfully saved with name : %s" % name_of_file)
 
 
-def decode_img_data():
-    img = cv2.imread(input("\nEnter the PATH of the image you need to Decode to get the Secret message : "))
+def decode_img_data(path):
+    img = cv2.imread(path)
     data_binary = ""
     for i in img:
         for pixel in i:
@@ -236,8 +236,8 @@ def encode_aud_data(msg, file_type, path):
     song.close()
 
 
-def decode_aud_data():
-    name_of_file = input("\nEnter name of the stego file to be decoded : ")
+def decode_aud_data(path):
+    name_of_file = path
     song = wave.open(name_of_file, mode='rb')
 
     n_frames = song.getnframes()
@@ -415,11 +415,11 @@ def encode_vid_data(msg, file_type, path):
         pickle.dump(total_frames, file)
 
 
-def decode_vid_data():
+def decode_vid_data(path):
     with open('video_frame_file.pkl', 'rb') as file:
         frame_ = pickle.load(file)
 
-    cap = cv2.VideoCapture('stego_video.mp4')
+    cap = cv2.VideoCapture(path)
     max_frame = 0
     while cap.isOpened():
         ret, frame = cap.read()
@@ -458,9 +458,9 @@ def encrypt(pub_key_file, up_file):
     return (b'%b %b' % (cipher_text, cipher_key)), msg_type
 
 
-def decrypt(encoded_message):
+def decrypt(encoded_message, key_file_path):
     file_type = encoded_message.split("#type#")[-1]
-    prv_key = input("\nEnter PRIVATE KEY file name (!! WITH EXTENSION !!) : ")
+    prv_key = key_file_path
     plain_text = "secretMessage.%s" % file_type
     n, d = open(prv_key, 'r').read().split(',')
     c_items = bytes.fromhex(encoded_message.split("#type#")[-2]).split(b' ')
