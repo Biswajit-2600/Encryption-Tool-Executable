@@ -1,5 +1,7 @@
 import os
 import pickle
+from tkinter import messagebox, filedialog
+
 import pyaes
 import sys
 import wave
@@ -461,7 +463,9 @@ def encrypt(pub_key_file, up_file):
 def decrypt(encoded_message, key_file_path):
     file_type = encoded_message.split("#type#")[-1]
     prv_key = key_file_path
-    plain_text = "secretMessage.%s" % file_type
+    messagebox.showinfo("Select Directory!", "Select Directory to save Decrypted File!")
+    savefile_directory = filedialog.askdirectory()
+    plain_text = "%s/secretMessage.%s" % (savefile_directory, file_type)
     n, d = open(prv_key, 'r').read().split(',')
     c_items = bytes.fromhex(encoded_message.split("#type#")[-2]).split(b' ')
     cipher_text = b' '.join(c_items[:-1])

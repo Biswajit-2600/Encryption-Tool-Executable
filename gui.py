@@ -2,17 +2,9 @@ import ctypes
 import os
 import sys
 import webbrowser
-from pathlib import Path
 from tkinter import *
 from tkinter import messagebox, filedialog
 from Steganography_Tools_master import (crypt, genkeys)
-
-OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"D:\Dev\Python_Projects\Encryption_Tool_Windows\assets\frame0")
-
-
-def relative_to_assets(path: str) -> Path:
-    return ASSETS_PATH / Path(path)
 
 
 def on_entry_focus_in(event):
@@ -47,7 +39,6 @@ def perform_pop_up_action(this_entry, this_window):
 
 selected_file = False
 key_selected_file = False
-saving_directory = False
 
 
 def validate_file_encrypt():
@@ -85,7 +76,7 @@ def make_key_files(user_name, key_size=1024):
 
 
 def register_file_choice(this_entry, this_window):
-    global selected_file
+    global selected_file, key_selected_file
     choice = perform_pop_up_action(this_entry, this_window)
     this_window.destroy()
     if choice == "1":
@@ -95,7 +86,12 @@ def register_file_choice(this_entry, this_window):
         else:
             messagebox.showwarning("No File Selected!", "You have not selected any file!")
     elif choice == "2":
-        open_key_file_dialog()
+        key_selected_file = filedialog.askopenfilename(title="Choose File!")
+        if key_selected_file:
+            update_key_file_data(key_selected_file)
+        else:
+            messagebox.showwarning("No Key File Selected!", "You have not selected any file!")
+
     else:
         messagebox.showwarning("Wrong Input!", "Input does NOT match any of the choices!")
         register_file_choice(this_entry, this_window)
@@ -304,6 +300,8 @@ def encrypt_file():
             ask_stego_choice_encrypt(encrypt_val.hex(), file_type)
             selected_file = False
             key_selected_file = False
+            update_upload_data(selected_file)
+            update_upload_data(key_selected_file)
         else:
             messagebox.showwarning("No Key File!", "Please provide the Public Key File!")
     except Exception as e:
@@ -325,26 +323,28 @@ def decrypt_file():
 
 
 def update_upload_data(file_path):
-    file_name = file_path.split("/")[-1]
-    change_image = PhotoImage(
-        file="assets/frame0/file_change.png")
-    display_text = "File : %s" % file_name
-    canvas.itemconfig(up_image, image=change_image)
-    canvas.change_image = change_image
-    canvas.itemconfig(up_rectangle_text, text=display_text, fill="#CEE6F3",
-                      font=("Inter Black", 15 * 1),
-                      width=300,
-                      justify=LEFT,
-                      tags="updated_text")
+    if file_path:
+        file_name = file_path.split("/")[-1]
+        change_image = PhotoImage(
+            file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/file_change.png")
+        display_text = "File : %s" % file_name
+        canvas.itemconfig(up_image, image=change_image)
+        canvas.change_image = change_image
+        canvas.itemconfig(up_rectangle_text, text=display_text, fill="#CEE6F3",
+                          font=("Inter Black", 15 * 1),
+                          width=300,
+                          justify=LEFT,
+                          tags="updated_text")
 
 
 def update_key_file_data(pub_file_path):
-    pub_file_name = pub_file_path.split("/")[-1]
-    canvas.itemconfig(key_file_text, text="Key File : %s" % pub_file_name, fill="#CEE6F3",
-                      font=("Inter Black", 15 * 1),
-                      width=300,
-                      justify=LEFT,
-                      tags="updated_text")
+    if pub_file_path:
+        pub_file_name = pub_file_path.split("/")[-1]
+        canvas.itemconfig(key_file_text, text="Key File : %s" % pub_file_name, fill="#CEE6F3",
+                          font=("Inter Black", 15 * 1),
+                          width=300,
+                          justify=LEFT,
+                          tags="updated_text")
 
 
 def open_update_file_dialog():
@@ -424,7 +424,7 @@ custom_font = ("Helvetica", 15, "bold")
 window.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 window.configure(bg="#FFFFFF")
 window.title('Encryption Tool')
-icon = PhotoImage(file="assets/favicon-32x32-black.png")
+icon = PhotoImage(file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/favicon-32x32-black.png")
 window.iconphoto(True, icon)
 
 my_app_id = 'my_company.my_product.sub_product.version'  # arbitrary string
@@ -442,7 +442,7 @@ canvas = Canvas(
 
 canvas.place(x=0, y=0)
 image_bg_image = PhotoImage(
-    file=relative_to_assets("bg_image.png"))
+    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/bg_image.png")
 bg_image = canvas.create_image(
     400.0,
     300.0,
@@ -482,7 +482,7 @@ canvas.tag_bind(up_rectangle, '<Leave>', lambda event: canvas.config(cursor=""))
 canvas.tag_bind(up_rectangle, '<Button-1>', open_file_dialog)
 
 image_up_image = PhotoImage(
-    file="assets/frame0/up_image.png")
+    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/up_image.png")
 up_image = canvas.create_image(
     560.0,
     230.0,
@@ -494,7 +494,7 @@ canvas.tag_bind(up_image, '<Leave>', lambda event: canvas.config(cursor=""))
 canvas.tag_bind(up_image, '<Button-1>', open_file_dialog)
 
 button_image_1 = PhotoImage(
-    file="assets/frame0/decrypt_btn.png")
+    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/decrypt_btn.png")
 
 decrypt_btn = Button(
     image=button_image_1,
@@ -512,7 +512,7 @@ decrypt_btn.place(
 )
 
 button_image_2 = PhotoImage(
-    file=relative_to_assets("encrypt_btn.png"))
+    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/encrypt_btn.png")
 encrypt_btn = Button(
     image=button_image_2,
     borderwidth=0,
@@ -529,7 +529,7 @@ encrypt_btn.place(
 )
 
 button_image_3 = PhotoImage(
-    file=relative_to_assets("gen_keys_btn.png"))
+    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/gen_keys_btn.png")
 gen_keys_btn = Button(
     image=button_image_3,
     borderwidth=0,
@@ -546,7 +546,7 @@ gen_keys_btn.place(
 )
 
 entry_image_1 = PhotoImage(
-    file=relative_to_assets("entry_1.png"))
+    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/entry_1.png")
 entry_bg_1 = canvas.create_image(
     175.0,
     224.5,
