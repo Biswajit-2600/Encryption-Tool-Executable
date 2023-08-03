@@ -326,7 +326,7 @@ def update_upload_data(file_path):
     if file_path:
         file_name = file_path.split("/")[-1]
         change_image = PhotoImage(
-            file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/file_change.png")
+            file="assets/frame0/file_change.png")
         display_text = "File : %s" % file_name
         canvas.itemconfig(up_image, image=change_image)
         canvas.change_image = change_image
@@ -424,7 +424,7 @@ custom_font = ("Helvetica", 15, "bold")
 window.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 window.configure(bg="#FFFFFF")
 window.title('Encryption Tool')
-icon = PhotoImage(file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/favicon-32x32-black.png")
+icon = PhotoImage(file="assets/frame0/favicon-32x32-black.png")
 window.iconphoto(True, icon)
 
 my_app_id = 'my_company.my_product.sub_product.version'  # arbitrary string
@@ -442,7 +442,7 @@ canvas = Canvas(
 
 canvas.place(x=0, y=0)
 image_bg_image = PhotoImage(
-    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/bg_image.png")
+    file="assets/frame0/bg_image.png")
 bg_image = canvas.create_image(
     400.0,
     300.0,
@@ -482,7 +482,7 @@ canvas.tag_bind(up_rectangle, '<Leave>', lambda event: canvas.config(cursor=""))
 canvas.tag_bind(up_rectangle, '<Button-1>', open_file_dialog)
 
 image_up_image = PhotoImage(
-    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/up_image.png")
+    file="assets/frame0/up_image.png")
 up_image = canvas.create_image(
     560.0,
     230.0,
@@ -494,7 +494,7 @@ canvas.tag_bind(up_image, '<Leave>', lambda event: canvas.config(cursor=""))
 canvas.tag_bind(up_image, '<Button-1>', open_file_dialog)
 
 button_image_1 = PhotoImage(
-    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/decrypt_btn.png")
+    file="assets/frame0/decrypt_btn.png")
 
 decrypt_btn = Button(
     image=button_image_1,
@@ -512,7 +512,7 @@ decrypt_btn.place(
 )
 
 button_image_2 = PhotoImage(
-    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/encrypt_btn.png")
+    file="assets/frame0/encrypt_btn.png")
 encrypt_btn = Button(
     image=button_image_2,
     borderwidth=0,
@@ -529,7 +529,7 @@ encrypt_btn.place(
 )
 
 button_image_3 = PhotoImage(
-    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/gen_keys_btn.png")
+    file="assets/frame0/gen_keys_btn.png")
 gen_keys_btn = Button(
     image=button_image_3,
     borderwidth=0,
@@ -546,7 +546,7 @@ gen_keys_btn.place(
 )
 
 entry_image_1 = PhotoImage(
-    file="D:/Dev/Python_Projects/Encryption_Tool_Windows/assets/frame0/entry_1.png")
+    file="assets/frame0/entry_1.png")
 entry_bg_1 = canvas.create_image(
     175.0,
     224.5,
